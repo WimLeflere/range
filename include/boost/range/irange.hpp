@@ -114,7 +114,7 @@ namespace boost
                         Integer,
                         boost::random_access_traversal_tag,
                         Integer,
-                        std::ptrdiff_t
+                        Integer
                     >
         {
             typedef boost::iterator_facade<
@@ -122,7 +122,7 @@ namespace boost
                         Integer,
                         boost::random_access_traversal_tag,
                         Integer,
-                        std::ptrdiff_t
+                        Integer
                     > base_t;
         public:
             typedef typename base_t::value_type value_type;
@@ -238,6 +238,22 @@ namespace boost
         return integer_range<Integer>(static_cast<Integer>(0), last);
     }
 
+   template <typename Float, typename StepSize>
+   strided_integer_range<Float>
+   frange(Float first, Float last, StepSize step_size)
+   {
+       BOOST_ASSERT(step_size != 0);
+       BOOST_ASSERT((step_size > 0) ? (last >= first) : (last <= first));
+
+       using iterator_t = range_detail::integer_iterator_with_step<Float>;
+
+       const std::ptrdiff_t num_steps = static_cast<std::ptrdiff_t>(std::ceil((last - first) / step_size));
+       BOOST_ASSERT(num_steps >= 0);
+
+       return strided_integer_range<Float>(
+           iterator_t(first, 0, step_size),
+           iterator_t(first, num_steps, step_size));
+   }
 } // namespace boost
 
 #endif // include guard
